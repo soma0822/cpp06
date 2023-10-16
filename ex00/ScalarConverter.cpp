@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/27 20:21:39 by soma              #+#    #+#             */
-/*   Updated: 2023/10/15 22:55:22 by soma             ###   ########.fr       */
+/*   Updated: 2023/10/16 15:20:21 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,21 @@ ScalarConverter::~ScalarConverter(void) {
 }
 
 
+bool	ScalarConverter::isChar(std::string const &input) {
+	if (input.length() == 1 && !std::isdigit(input[0]))
+		return true;
+	return false;
+}
+
 bool	ScalarConverter::isInt(std::string const &input) {
-	for (unsigned long i = 0; i < input.length(); i++)
+	unsigned long i = 0;
+	if (input[i] == '+' || input[i] == '-')
+		i++;
+	while (i < input.length())
 	{
-		if (!isdigit(input[i]))
+		if (!std::isdigit(input[i]))
 			return false;
+		i++;
 	}
 	return true;
 }
@@ -33,11 +43,16 @@ bool	ScalarConverter::isInt(std::string const &input) {
 bool	ScalarConverter::isFloat(std::string const &input) {
 	int	dot = 0;
 	unsigned long i = 0;
+	if (input[i] == '+' || input[i] == '-')
+		i++;
+	std::string tmp = input.substr(i, input.length() - i);
+	if (tmp == "nanf" || tmp == "inff")
+		return true;
 	while (i < input.length())
 	{
 		if (input[i] == '.')
 			dot++;
-		if (!isdigit(input[i]) && input[i] != '.')
+		if (!std::isdigit(input[i]) && input[i] != '.')
 			break;
 		i++;
 	}
@@ -50,79 +65,104 @@ bool	ScalarConverter::isFloat(std::string const &input) {
 
 bool	ScalarConverter::isDouble(std::string const &input) {
 	int	dot = 0;
-	for (unsigned long i = 0; i < input.length(); i++)
+	unsigned long i = 0;
+
+	if (input[0] == '+' || input[0] == '-')
+		i++;
+	std::string tmp = input.substr(i, input.length() - i);
+	if (tmp == "nan" || tmp == "inf")
+		return true;
+	while (i < input.length())
 	{
 		if (input[i] == '.')
 			dot++;
-		if (!isdigit(input[i]) && input[i] != '.')
+		if (!std::isdigit(input[i]) && input[i] != '.')
 			return false;
+		i++;
 	}
 	if (dot	== 1)
 		return true;
 	return false;
 }
 
-void	ScalarConverter::convert(std::string const &input) {
-	
-	if (input.length() == 1 && !isdigit(input[0]))
-	{
-		std::cout << "char: " << input[0] << std::endl;
-		std::cout << "int: " << static_cast<int>(input[0]) << std::endl;
-		std::cout << "float: " << static_cast<float>(input[0]) << std::endl;
-		std::cout << "double: " << static_cast<double>(input[0]) << std::endl;
+void	ScalarConverter::convertFromChar(std::string const &input){
+	std::cout << "char: " << input[0] << std::endl;
+	std::cout << "int: " << static_cast<int>(input[0]) << std::endl;
+	std::cout << "float: " << static_cast<float>(input[0]) << std::endl;
+	std::cout << "double: " << static_cast<double>(input[0]) << std::endl;	
+}
+
+void	ScalarConverter::convertFromInt(std::string const &input){
+	try {
+		int	tmp = std::stoi(input);
+		if (std::isprint(tmp) == 0)
+			std::cout << "char: Non displayable" << std::endl;
+		else
+			std::cout << "char: " << static_cast<char>(tmp) << std::endl;
+		std::cout << "int: " << tmp << std::endl;
+		std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(tmp) << "f" << std::endl;
+		std::cout << std::fixed << std::setprecision(1) << "double: " << static_cast<double>(tmp) << std::endl;
 	}
-	else if (ScalarConverter::isInt(input))
-	{
-		try {
-			int	tmp = std::stoi(input);
-			if (std::isprint(tmp) == 0)
-				std::cout << "char: Non displayable" << std::endl;
-			else
-				std::cout << "char: " << static_cast<char>(tmp) << std::endl;
-			std::cout << "int: " << tmp << std::endl;
-			std::cout << "float: " << static_cast<float>(tmp) << ".0f" << std::endl;
-			std::cout << "double: " << static_cast<double>(tmp) << ".0" << std::endl;
-		}
-		catch(std::exception &e) {
-			std::cout << "Invalid input: " << e.what() << std::endl;
-		}
+	catch(std::exception &e) {
+		std::cout << "Invalid input: " << e.what() << std::endl;
 	}
-	else if (ScalarConverter::isDouble(input))
-	{
-		try {
-			double	tmp = std::stod(input);
-			int		tmpInt = static_cast<int>(tmp);
+}
+
+void	ScalarConverter::convertFromDouble(std::string const &input){
+	try {
+		double	tmp = std::stod(input);
+		int		tmpInt = static_cast<int>(tmp);
+		if (input == "nan" || input == "+inf" || input == "-inf" || input == "inf") {
+			std::cout << "char: impossible" << std::endl;
+			std::cout << "int: impossible" << std::endl;
+		}
+		else {
 			if (std::isprint(tmpInt) == 0)
 				std::cout << "char: Non displayable" << std::endl;
 			else
 				std::cout << "char: " << static_cast<char>(tmpInt) << std::endl;
 			std::cout << "int: " << tmpInt << std::endl;
-			std::cout << "float: " << static_cast<float>(tmp) << "f" << std::endl;
-			std::cout << "double: " << static_cast<double>(tmp) << std::endl;
 		}
-		catch(std::exception &e) {
-			std::cout << "Invalid input: " << e.what() << std::endl;
-		}
+		std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(tmp) << "f" << std::endl;
+		std::cout << std::fixed << std::setprecision(1) << "double: " << static_cast<double>(tmp) << std::endl;
 	}
-	else if (ScalarConverter::isFloat(input))
-	{
-		try {
-		float	tmp = std::stod(input);
-		int		tmpInt = static_cast<int>(tmp);
-		if (std::isprint(tmpInt) == 0)
-			std::cout << "char: Non displayable" << std::endl;
-		else
-			std::cout << "char: " << static_cast<char>(tmpInt) << std::endl;
-		std::cout << "int: " << tmpInt << std::endl;
-		std::string zero;
-		std::cout << "float: " << static_cast<float>(tmp) << "f" << std::endl;
-		std::cout << "double: " << static_cast<double>(tmp) << std::endl;
-		}
-		catch(std::exception &e) {
-			std::cout << "Invalid input: " << e.what() << std::endl;
-		}
+	catch(std::exception &e) {
+		std::cout << "Invalid input: " << e.what() << std::endl;
 	}
-	return;
 }
 
+void	ScalarConverter::convertFromFloat(std::string const &input){
+	try {
+		float	tmp = std::stod(input);
+		int		tmpInt = static_cast<int>(tmp);
+		if (input == "nanf" || input == "+inff" || input == "-inff" || input == "inff") {
+			std::cout << "char: impossible" << std::endl;
+			std::cout << "int: impossible" << std::endl;
+		}
+		else {
+			if (std::isprint(tmpInt) == 0)
+				std::cout << "char: Non displayable" << std::endl;
+			else
+				std::cout << "char: " << static_cast<char>(tmpInt) << std::endl;
+			std::cout << "int: " << tmpInt << std::endl;
+		}
+		std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(tmp) << "f" << std::endl;
+		std::cout << std::fixed << std::setprecision(1) << "double: " << static_cast<double>(tmp) << std::endl;
+	}
+	catch(std::exception &e) {
+		std::cout << "Invalid input: " << e.what() << std::endl;
+	}
+}
 
+void	ScalarConverter::convert(std::string const &input) {
+	if (ScalarConverter::isChar(input))
+		ScalarConverter::convertFromChar(input);
+	else if (ScalarConverter::isInt(input))
+		ScalarConverter::convertFromInt(input);
+	else if (ScalarConverter::isFloat(input))
+		ScalarConverter::convertFromFloat(input);
+	else if (ScalarConverter::isDouble(input))
+		ScalarConverter::convertFromDouble(input);
+	else
+		std::cout << "Invalid input" << std::endl;
+}
