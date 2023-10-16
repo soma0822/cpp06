@@ -1,29 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Data.hpp                                           :+:      :+:    :+:   */
+/*   Serializer.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/16 15:36:56 by soma              #+#    #+#             */
-/*   Updated: 2023/10/16 15:38:18 by soma             ###   ########.fr       */
+/*   Created: 2023/10/16 15:39:22 by soma              #+#    #+#             */
+/*   Updated: 2023/10/16 16:05:29 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef SERIALIZER_HPP
+# define SERIALIZER_HPP
 
-#ifndef DATA_HPP
-# define DATA_HPP
+# include "Data.hpp"
 
-# include <iostream>
-# include <iomanip>
+class Serializer {
+	public:
+		static Data* deserialize(uintptr_t raw);
+		static uintptr_t serialize(Data* ptr);
 
-# define RED "\033[0;31m"
-# define RESET "\033[0m"
-
-typedef struct s_data {
-	std::string s1;
-	int n;
-	std::string s2;
-} Data;
+	private:
+		Serializer(void);
+		~Serializer(void);
+};
 
 #endif

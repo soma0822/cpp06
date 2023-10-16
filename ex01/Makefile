@@ -1,6 +1,6 @@
 NAME = a.out
 
-SRCS = main.cpp ScalarConverter.cpp
+SRCS = main.cpp Serializer.cpp
 
 OBJS = $(addprefix objs/, $(SRCS:.cpp=.o))
 
